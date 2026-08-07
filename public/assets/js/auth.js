@@ -25,15 +25,14 @@ if (signupForm) {
     const emailInput = document.getElementById("email");
     const passwordInputField = document.getElementById("password");
     const messageBox = document.getElementById("formMessage");
+    const submitBtn = signupForm.querySelector("button[type=submit]");
 
     const fullName = fullNameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInputField.value;
 
-    // Basic email format check
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Validate each field, focus and stop at the first problem
     if (fullName.length < 2) {
       messageBox.textContent = "Please enter your full name.";
       messageBox.className = "form-message error";
@@ -57,28 +56,42 @@ if (signupForm) {
 
     messageBox.textContent = "Creating your account...";
     messageBox.className = "form-message";
+    submitBtn.disabled = true;
 
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          full_name: fullName
+    try {
+      // If Supabase takes longer than 10 seconds, stop waiting and show an error
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out. Check your internet connection and try again.")), 10000)
+      );
+
+      const signupPromise = supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: { full_name: fullName }
         }
+      });
+
+      const { data, error } = await Promise.race([signupPromise, timeoutPromise]);
+
+      if (error) {
+        messageBox.textContent = error.message;
+        messageBox.className = "form-message error";
+        submitBtn.disabled = false;
+        return;
       }
-    });
 
-    if (error) {
-      messageBox.textContent = error.message;
+      messageBox.textContent = "Account created! Redirecting to login...";
+      messageBox.className = "form-message success";
+
+      setTimeout(function () {
+        window.location.href = "login.html";
+      }, 1500);
+
+    } catch (err) {
+      messageBox.textContent = err.message || "Something went wrong. Please try again.";
       messageBox.className = "form-message error";
-      return;
+      submitBtn.disabled = false;
     }
-
-    messageBox.textContent = "Account created! Redirecting to login...";
-    messageBox.className = "form-message success";
-
-    setTimeout(function () {
-      window.location.href = "login.html";
-    }, 1500);
   });
-    }
+      }
