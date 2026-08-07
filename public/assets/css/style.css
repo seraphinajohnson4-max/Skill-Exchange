@@ -245,3 +245,24 @@ footer {
     padding: 24px 20px;
   }
 }
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 60px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #1a3a8f;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  }
