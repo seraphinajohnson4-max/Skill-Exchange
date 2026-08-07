@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Sign Up - Skill Exchange</title>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        </head>
+        <body>
+
+          <header class="navbar">
+              <div class="logo">
+                    <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
+                          <span>SkillExchange</span>
+                              </div>
+                                  <nav>
+                                        <a href="../index.html">Home</a>
+                                              <a href="login.html">Login</a>
+                                                  </nav>
+                                                    </header>
+
+                                                      <section class="auth-section">
+                                                          <div class="auth-card">
+                                                                <h1>Create Your Account</h1>
+                                                                      <p class="auth-subtitle">Join fellow students trading skills.</p>
+
+                                                                            <form id="signupForm">
+                                                                                    <label for="fullName">Full Name</label>
+                                                                                            <input type="text" id="fullName" required minlength="2">
+
+                                                                                                    <label for="email">Email</label>
+                                                                                                            <input type="email" id="email" required>
+
+                                                                                                                    <label for="password">Password</label>
+                                                                                                                            <input type="password" id="password" required minlength="6">
+
+                                                                                                                                    <p id="formMessage" class="form-message"></p>
+
+                                                                                                                                            <button type="submit" class="btn-primary btn-large btn-full">Sign Up</button>
+                                                                                                                                                  </form>
+
+                                                                                                                                                        <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+                                                                                                                                                            </div>
+                                                                                                                                                              </section>
+
+                                                                                                                                                                <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                                                                                                                                                                  <script src="../assets/js/supabase-client.js"></script>
+                                                                                                                                                                    <script src="../assets/js/auth.js"></script>
+
+                                                                                                                                                                    </body>
+                                                                                                                                                                    </html>
