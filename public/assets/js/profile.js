@@ -37,7 +37,7 @@ if (cancelEditBtn) {
   });
 }
 
-// Render display chips (read-only view)
+// Render read-only display chips
 function renderDisplayChips(containerId, skillNames) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -49,56 +49,126 @@ function renderDisplayChips(containerId, skillNames) {
   });
 }
 
-// Build the category-grouped picker UI
-function renderPicker(containerId, selectedSet) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
+// Sets up a tag-style autocomplete input. Returns a function to re-render its tags.
+function setupTagInput(inputId, tagsId, suggestionsId, selectedSet) {
+  const input = document.getElementById(inputId);
+  const tagsContainer = document.getElementById(tagsId);
+  const suggestionsBox = document.getElementById(suggestionsId);
 
-  const byCategory = {};
-  allSkills.forEach(skill => {
-    const catName = skill.categories?.name || "Other";
-    if (!byCategory[catName]) byCategory[catName] = [];
-    byCategory[catName].push(skill);
-  });
+  function renderTags() {
+    tagsContainer.innerHTML = "";
+    selectedSet.forEach(skillId => {
+      const skill = allSkills.find(s => s.id === skillId);
+      if (!skill) return;
 
-  Object.keys(byCategory).forEach(catName => {
-    const catDiv = document.createElement("div");
-    catDiv.className = "picker-category";
-
-    const heading = document.createElement("h5");
-    heading.textContent = catName;
-    catDiv.appendChild(heading);
-
-    const optionsDiv = document.createElement("div");
-    optionsDiv.className = "picker-options";
-
-    byCategory[catName].forEach(skill => {
       const chip = document.createElement("span");
-      chip.className = "picker-chip";
-      chip.textContent = skill.name;
-      chip.dataset.skillId = skill.id;
+      chip.className = "tag-chip";
 
-      if (selectedSet.has(skill.id)) chip.classList.add("selected");
+      const label = document.createElement("span");
+      label.textContent = skill.name;
+      chip.appendChild(label);
 
-      chip.addEventListener("click", function () {
-        if (selectedSet.has(skill.id)) {
-          selectedSet.delete(skill.id);
-          chip.classList.remove("selected");
-        } else {
-          selectedSet.add(skill.id);
-          chip.classList.add("selected");
-        }
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.textContent = "×";
+      removeBtn.addEventListener("click", function () {
+        selectedSet.delete(skillId);
+        renderTags();
       });
+      chip.appendChild(removeBtn);
 
-      optionsDiv.appendChild(chip);
+      tagsContainer.appendChild(chip);
+    });
+  }
+
+  function showSuggestions() {
+    const query = input.value.trim().toLowerCase();
+    suggestionsBox.innerHTML = "";
+
+    if (!query) {
+      suggestionsBox.classList.remove("open");
+      return;
+    }
+
+    const matches = allSkills
+      .filter(s => s.name.toLowerCase().includes(query) && !selectedSet.has(s.id))
+      .slice(0, 8);
+
+    matches.forEach(skill => {
+      const item = document.createElement("div");
+      item.className = "suggestion-item";
+      item.textContent = skill.name;
+      item.addEventListener("click", function () {
+        selectedSet.add(skill.id);
+        renderTags();
+        input.value = "";
+        suggestionsBox.classList.remove("open");
+      });
+      suggestionsBox.appendChild(item);
     });
 
-    catDiv.appendChild(optionsDiv);
-    container.appendChild(catDiv);
+    const exactMatch = allSkills.some(s => s.name.toLowerCase() === query);
+    if (!exactMatch) {
+      const addItem = document.createElement("div");
+      addItem.className = "suggestion-item add-new";
+      addItem.textContent = `+ Add "${input.value.trim()}" as a new skill`;
+      addItem.addEventListener("click", async function () {
+        const newName = input.value.trim();
+        const { data: newSkill, error } = await supabaseClient
+          .from("skills")
+          .insert({ name: newName, category_id: null })
+          .select()
+          .single();
+
+        if (error) {
+          alert("Could not add skill: " + error.message);
+          return;
+        }
+
+        allSkills.push({ id: newSkill.id, name: newSkill.name, categories: null });
+        selectedSet.add(newSkill.id);
+        renderTags();
+        input.value = "";
+        suggestionsBox.classList.remove("open");
+      });
+      suggestionsBox.appendChild(addItem);
+    }
+
+    suggestionsBox.classList.add("open");
+  }
+
+  input.addEventListener("input", showSuggestions);
+  input.addEventListener("focus", showSuggestions);
+
+  document.addEventListener("click", function (e) {
+    if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      suggestionsBox.classList.remove("open");
+    }
   });
+
+  renderTags();
+  return renderTags;
 }
 
-// Load profile + protect page
+let renderTeachTags = null;
+let renderLearnTags = null;
+
+// Refresh the read-only display without reloading everything from the database
+function refreshDisplay() {
+  const fullName = document.getElementById("fullName").value.trim();
+  const bio = document.getElementById("bio").value.trim();
+
+  document.getElementById("displayName").textContent = fullName;
+  document.getElementById("displayBio").textContent = bio || "No bio added yet.";
+
+  const teachNames = [...selectedTeach].map(id => allSkills.find(s => s.id === id)?.name).filter(Boolean);
+  const learnNames = [...selectedLearn].map(id => allSkills.find(s => s.id === id)?.name).filter(Boolean);
+
+  renderDisplayChips("teachChips", teachNames);
+  renderDisplayChips("learnChips", learnNames);
+}
+
+// Load profile + protect page (runs once on page load)
 async function loadProfile() {
   const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -109,61 +179,39 @@ async function loadProfile() {
 
   currentUserId = session.user.id;
 
-  // Load all available skills with their category names
-  const { data: skillsData, error: skillsError } = await supabaseClient
+  const { data: skillsData } = await supabaseClient
     .from("skills")
     .select("id, name, categories(name)")
     .order("name");
 
-  if (skillsError) {
-    document.getElementById("teachSkillsPicker").textContent = "Error loading skills: " + skillsError.message;
-    console.log(skillsError);
-    return;
-  }
-
   allSkills = skillsData || [];
 
-  alert("Skills loaded: " + allSkills.length);
-
-  if (allSkills.length === 0) {
-    document.getElementById("teachSkillsPicker").textContent = "No skills found in database.";
-  }
-
-  // Load this user's profile
   const { data: profile } = await supabaseClient
     .from("profiles")
     .select("*")
     .eq("id", currentUserId)
     .single();
 
-  // Load this user's selected skills
   const { data: userSkills } = await supabaseClient
     .from("user_skills")
-    .select("skill_id, type, skills(name)")
+    .select("skill_id, type")
     .eq("user_id", currentUserId);
 
-  selectedTeach = new Set((userSkills || []).filter(s => s.type === "teach").map(s => s.skill_id));
-  selectedLearn = new Set((userSkills || []).filter(s => s.type === "learn").map(s => s.skill_id));
-
-  const teachNames = (userSkills || []).filter(s => s.type === "teach").map(s => s.skills.name);
-  const learnNames = (userSkills || []).filter(s => s.type === "learn").map(s => s.skills.name);
+  (userSkills || []).filter(s => s.type === "teach").forEach(s => selectedTeach.add(s.skill_id));
+  (userSkills || []).filter(s => s.type === "learn").forEach(s => selectedLearn.add(s.skill_id));
 
   const name = profile?.full_name || session.user.user_metadata?.full_name || "Student";
   const avatarUrl = profile?.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(name));
 
-  document.getElementById("displayName").textContent = name;
-  document.getElementById("displayBio").textContent = profile?.bio || "No bio added yet.";
   document.getElementById("avatarPreview").src = avatarUrl;
   document.getElementById("navAvatar").src = avatarUrl;
-
-  renderDisplayChips("teachChips", teachNames);
-  renderDisplayChips("learnChips", learnNames);
-
   document.getElementById("fullName").value = name;
   document.getElementById("bio").value = profile?.bio || "";
 
-  renderPicker("teachSkillsPicker", selectedTeach);
-  renderPicker("learnSkillsPicker", selectedLearn);
+  renderTeachTags = setupTagInput("teachSkillsInput", "teachTags", "teachSuggestions", selectedTeach);
+  renderLearnTags = setupTagInput("learnSkillsInput", "learnTags", "learnSuggestions", selectedLearn);
+
+  refreshDisplay();
 }
 
 loadProfile();
@@ -223,7 +271,6 @@ if (profileForm) {
     messageBox.className = "form-message";
     submitBtn.disabled = true;
 
-    // Save bio/name
     const { error: profileError } = await supabaseClient
       .from("profiles")
       .upsert({ id: currentUserId, full_name: fullName, bio: bio });
@@ -235,16 +282,11 @@ if (profileForm) {
       return;
     }
 
-    // Replace this user's skill selections: delete old, insert current
     await supabaseClient.from("user_skills").delete().eq("user_id", currentUserId);
 
     const rowsToInsert = [];
-    selectedTeach.forEach(skillId => {
-      rowsToInsert.push({ user_id: currentUserId, skill_id: skillId, type: "teach" });
-    });
-    selectedLearn.forEach(skillId => {
-      rowsToInsert.push({ user_id: currentUserId, skill_id: skillId, type: "learn" });
-    });
+    selectedTeach.forEach(skillId => rowsToInsert.push({ user_id: currentUserId, skill_id: skillId, type: "teach" }));
+    selectedLearn.forEach(skillId => rowsToInsert.push({ user_id: currentUserId, skill_id: skillId, type: "learn" }));
 
     if (rowsToInsert.length > 0) {
       const { error: skillsError } = await supabaseClient.from("user_skills").insert(rowsToInsert);
@@ -260,7 +302,7 @@ if (profileForm) {
     messageBox.textContent = "Profile saved!";
     messageBox.className = "form-message success";
     profileForm.classList.add("hidden");
-    loadProfile();
+    refreshDisplay();
   });
 }
 
@@ -272,4 +314,4 @@ if (logoutBtn) {
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   });
-}
+    }
