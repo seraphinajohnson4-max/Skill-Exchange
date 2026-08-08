@@ -819,3 +819,77 @@ footer {
   color: var(--green);
   font-weight: 600;
   }
+
+.search-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  animation: fadeUp 0.5s ease both;
+}
+
+.search-page h1 {
+  color: var(--navy-dark);
+  font-size: 1.7rem;
+}
+
+.search-bar {
+  margin-top: 24px;
+  max-width: 100%;
+}
+
+.search-bar input {
+  font-size: 1rem;
+}
+
+.results-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border: 1px solid #eef1f6;
+  border-radius: 14px;
+  padding: 16px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeUp 0.4s ease both;
+}
+
+.student-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(18,42,102,0.1);
+}
+
+.student-card img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.student-card-info h3 {
+  color: var(--navy);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.student-card-info p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 40px;
+  font-size: 0.95rem;
+  }
