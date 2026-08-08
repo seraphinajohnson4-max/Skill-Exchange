@@ -95,3 +95,78 @@ if (signupForm) {
     }
   });
       }
+
+// Password show/hide toggle (Login page)
+const toggleLoginBtn = document.getElementById("toggleLoginPassword");
+const loginPasswordInput = document.getElementById("loginPassword");
+
+if (toggleLoginBtn) {
+  toggleLoginBtn.addEventListener("click", function () {
+    if (loginPasswordInput.type === "password") {
+      loginPasswordInput.type = "text";
+      toggleLoginBtn.textContent = "Hide";
+    } else {
+      loginPasswordInput.type = "password";
+      toggleLoginBtn.textContent = "Show";
+    }
+  });
+}
+
+// Handles Login form submission
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+  loginForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const emailInput = document.getElementById("loginEmail");
+    const passwordInput = document.getElementById("loginPassword");
+    const messageBox = document.getElementById("loginMessage");
+    const submitBtn = loginForm.querySelector("button[type=submit]");
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      messageBox.textContent = "Please fill in both fields.";
+      messageBox.className = "form-message error";
+      return;
+    }
+
+    messageBox.textContent = "Logging in...";
+    messageBox.className = "form-message";
+    submitBtn.disabled = true;
+
+    try {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out. Check your internet connection and try again.")), 10000)
+      );
+
+      const loginPromise = supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
+
+      if (error) {
+        messageBox.textContent = error.message;
+        messageBox.className = "form-message error";
+        submitBtn.disabled = false;
+        return;
+      }
+
+      messageBox.textContent = "Login successful! Redirecting...";
+      messageBox.className = "form-message success";
+
+      setTimeout(function () {
+        window.location.href = "dashboard.html";
+      }, 1000);
+
+    } catch (err) {
+      messageBox.textContent = err.message || "Something went wrong. Please try again.";
+      messageBox.className = "form-message error";
+      submitBtn.disabled = false;
+    }
+  });
+}
