@@ -1,5 +1,23 @@
 const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/initials/svg?seed=";
 
+async function loadNotifBadge(userId) {
+  const { count } = await supabaseClient
+    .from("exchange_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", userId)
+    .eq("status", "pending");
+
+  const badge = document.getElementById("notifBadge");
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count > 9 ? "9+" : count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+}
+
 // Protects this page: redirect to login if not signed in
 async function checkAuth() {
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -23,6 +41,8 @@ async function checkAuth() {
 
   const navAvatar = document.getElementById("navAvatar");
   if (navAvatar) navAvatar.src = avatarUrl;
+
+  loadNotifBadge(session.user.id);
 }
 
 checkAuth();
@@ -49,4 +69,4 @@ if (logoutBtn) {
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   });
-}
+    }
