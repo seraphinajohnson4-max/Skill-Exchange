@@ -123,6 +123,8 @@ async function loadProfile() {
 
   allSkills = skillsData || [];
 
+  alert("Skills loaded: " + allSkills.length);
+
   if (allSkills.length === 0) {
     document.getElementById("teachSkillsPicker").textContent = "No skills found in database.";
   }
