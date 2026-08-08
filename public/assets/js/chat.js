@@ -121,11 +121,19 @@ chatForm.addEventListener("submit", async function (e) {
 
   chatInput.value = "";
 
-  await supabaseClient.from("messages").insert({
+  const { data, error } = await supabaseClient.from("messages").insert({
     conversation_id: conversationId,
     sender_id: currentUserId,
     content: text
-  });
+  }).select().single();
+
+  if (error) {
+    alert("Message failed to send: " + error.message);
+    return;
+  }
+
+  renderMessage(data);
+  scrollToBottom();
 });
 
 // Send file
