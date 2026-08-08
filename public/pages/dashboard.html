@@ -13,10 +13,16 @@
       <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
       <span>SkillExchange</span>
     </div>
-    <nav>
-      <a href="profile.html">My Profile</a>
-      <a href="#" id="logoutBtn">Log Out</a>
-    </nav>
+    <div class="nav-menu-wrapper">
+      <button id="menuToggle" class="menu-toggle" aria-label="Account menu">
+        <img id="navAvatar" src="" alt="" class="nav-avatar-icon">
+      </button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="profile.html">My Profile</a>
+        <a href="#" id="logoutBtn">Log Out</a>
+      </div>
+    </div>
   </header>
 
   <section class="dashboard-section">
