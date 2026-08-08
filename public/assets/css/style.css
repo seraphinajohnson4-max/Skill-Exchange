@@ -130,28 +130,45 @@ h1, h2, h3 {
   animation: fadeUp 0.8s ease 0.3s both;
 }
 
-.skill-tag {
+.float-shape {
   position: absolute;
-  background: white;
-  border: 1px solid #e3e8f0;
-  border-radius: 999px;
-  padding: 6px 16px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--navy);
-  box-shadow: 0 4px 12px rgba(26,58,143,0.08);
-  animation: floatTag 6s ease-in-out infinite;
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: floatShape 8s ease-in-out infinite;
   z-index: 1;
 }
 
-.skill-tag:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; }
-.skill-tag:nth-child(2) { top: 65%; left: 12%; animation-delay: 1.2s; }
-.skill-tag:nth-child(3) { top: 20%; right: 8%; animation-delay: 0.6s; }
-.skill-tag:nth-child(4) { top: 70%; right: 10%; animation-delay: 1.8s; }
+.shape-1 {
+  width: 70px; height: 70px;
+  background: var(--navy);
+  top: 12%; left: 8%;
+  animation-delay: 0s;
+}
 
-@keyframes floatTag {
+.shape-2 {
+  width: 50px; height: 50px;
+  background: var(--green);
+  top: 65%; left: 14%;
+  animation-delay: 1.5s;
+}
+
+.shape-3 {
+  width: 90px; height: 90px;
+  background: var(--green);
+  top: 18%; right: 8%;
+  animation-delay: 0.8s;
+}
+
+.shape-4 {
+  width: 45px; height: 45px;
+  background: var(--navy);
+  top: 68%; right: 12%;
+  animation-delay: 2.2s;
+}
+
+@keyframes floatShape {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-14px); }
+  50% { transform: translateY(-18px); }
 }
 
 @keyframes fadeUp {
