@@ -1,6 +1,23 @@
 const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/initials/svg?seed=";
 
-// Dropdown menu
+async function loadNotifBadge(userId) {
+  const { count } = await supabaseClient
+    .from("exchange_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", userId)
+    .eq("status", "pending");
+
+  const badge = document.getElementById("notifBadge");
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count > 9 ? "9+" : count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+}
+
 const menuToggle = document.getElementById("menuToggle");
 const dropdownMenu = document.getElementById("dropdownMenu");
 
@@ -42,6 +59,8 @@ async function init() {
   const myName = myProfile?.full_name || session.user.email;
   document.getElementById("navAvatar").src = myProfile?.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(myName));
 
+  loadNotifBadge(session.user.id);
+
   const params = new URLSearchParams(window.location.search);
   const viewedUserId = params.get("user");
 
@@ -78,7 +97,6 @@ async function init() {
   if (viewedUserId === session.user.id) {
     requestBtn.style.display = "none";
   } else {
-    // Check if a request already exists between these two users
     const { data: existing } = await supabaseClient
       .from("exchange_requests")
       .select("id, status")
@@ -114,7 +132,6 @@ async function init() {
 
 init();
 
-// Log out
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async function (e) {
