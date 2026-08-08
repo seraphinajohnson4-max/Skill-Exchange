@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile - Skill Exchange</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
+      <span>SkillExchange</span>
+    </div>
+    <div class="nav-menu-wrapper">
+      <button id="menuToggle" class="menu-toggle" aria-label="Account menu">
+        <img id="navAvatar" src="" alt="" class="nav-avatar-icon">
+      </button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="search.html">Search</a>
+        <a href="profile.html">My Profile</a>
+        <a href="#" id="logoutBtn">Log Out</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="profile-page">
+    <div class="profile-cover">
+      <div class="avatar-wrapper">
+        <img id="viewAvatar" src="" alt="Profile picture" class="avatar-img">
+      </div>
+    </div>
+
+    <div class="profile-info">
+      <h1 id="viewName">Loading...</h1>
+      <p id="viewBio" class="profile-bio"></p>
+
+      <div class="chip-group">
+        <h4>Can Teach</h4>
+        <div id="viewTeachChips" class="chip-row"></div>
+      </div>
+
+      <div class="chip-group">
+        <h4>Wants to Learn</h4>
+        <div id="viewLearnChips" class="chip-row"></div>
+      </div>
+
+      <button id="requestBtn" class="btn-primary btn-large">Request Skill Exchange</button>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/view-profile.js"></script>
+
+</body>
+        </html>
