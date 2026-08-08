@@ -96,6 +96,14 @@ async function init() {
   (messages || []).forEach(renderMessage);
   scrollToBottom();
 
+  // Mark all messages from the other person as read
+  await supabaseClient
+    .from("messages")
+    .update({ is_read: true })
+    .eq("conversation_id", conversationId)
+    .neq("sender_id", currentUserId)
+    .eq("is_read", false);
+
   // Listen for new messages in real time
   supabaseClient
     .channel("messages-" + conversationId)
