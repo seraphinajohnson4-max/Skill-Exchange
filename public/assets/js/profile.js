@@ -110,12 +110,22 @@ async function loadProfile() {
   currentUserId = session.user.id;
 
   // Load all available skills with their category names
-  const { data: skillsData } = await supabaseClient
+  const { data: skillsData, error: skillsError } = await supabaseClient
     .from("skills")
     .select("id, name, categories(name)")
     .order("name");
 
+  if (skillsError) {
+    document.getElementById("teachSkillsPicker").textContent = "Error loading skills: " + skillsError.message;
+    console.log(skillsError);
+    return;
+  }
+
   allSkills = skillsData || [];
+
+  if (allSkills.length === 0) {
+    document.getElementById("teachSkillsPicker").textContent = "No skills found in database.";
+  }
 
   // Load this user's profile
   const { data: profile } = await supabaseClient
