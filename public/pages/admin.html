@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Skill Exchange</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
+      <span>SkillExchange <span class="admin-tag">Admin</span></span>
+    </div>
+    <div class="nav-menu-wrapper">
+      <a href="profile.html" class="avatar-link">
+        <img id="navAvatar" src="" alt="" class="nav-avatar-icon">
+        <span id="notifBadge" class="notif-badge hidden">0</span>
+      </a>
+      <button id="menuToggle" class="menu-toggle" aria-label="Menu">☰</button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="admin.html">Admin Panel</a>
+        <a href="#" id="logoutBtn">Log Out</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="search-page">
+    <h1>Admin Panel</h1>
+    <p class="auth-subtitle">Platform overview and management.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h2 id="statUsers">-</h2>
+        <p>Students</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="statSkills">-</h2>
+        <p>Skills Listed</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="statRequests">-</h2>
+        <p>Exchange Requests</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="statMessages">-</h2>
+        <p>Messages Sent</p>
+      </div>
+    </div>
+
+    <h3 class="section-label">Students</h3>
+    <div id="userList" class="results-grid"></div>
+
+    <h3 class="section-label">Manage Skills</h3>
+    <div id="skillsList" class="skills-admin-list"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/admin.js"></script>
+
+</body>
+</html>
