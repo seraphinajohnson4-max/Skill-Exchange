@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Students - Skill Exchange</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
+      <span>SkillExchange</span>
+    </div>
+    <div class="nav-menu-wrapper">
+      <button id="menuToggle" class="menu-toggle" aria-label="Account menu">
+        <img id="navAvatar" src="" alt="" class="nav-avatar-icon">
+      </button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="search.html">Search</a>
+        <a href="profile.html">My Profile</a>
+        <a href="#" id="logoutBtn">Log Out</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="search-page">
+    <h1>Find a Skill</h1>
+    <p class="auth-subtitle">Search for students who can teach you something new.</p>
+
+    <div class="tag-input-wrapper search-bar">
+      <input type="text" id="searchInput" placeholder="Search by skill, e.g. Guitar">
+      <div id="searchSuggestions" class="suggestions-dropdown"></div>
+    </div>
+
+    <div id="searchResults" class="results-grid"></div>
+    <p id="emptyState" class="empty-state hidden">No students found teaching that skill yet.</p>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/search.js"></script>
+
+</body>
+    </html>
