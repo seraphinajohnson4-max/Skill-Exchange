@@ -118,6 +118,13 @@ async function loadConversations() {
       else if (lastMsg.file_type) preview = `📎 Sent a ${lastMsg.file_type}`;
     }
 
+    const { count: unreadCount } = await supabaseClient
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .eq("conversation_id", conv.id)
+      .eq("is_read", false)
+      .neq("sender_id", currentUserId);
+
     const avatarUrl = profile.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(profile.full_name || "Student"));
 
     const card = document.createElement("a");
@@ -129,6 +136,7 @@ async function loadConversations() {
         <h3>${profile.full_name || "Student"}</h3>
         <p>${preview}</p>
       </div>
+      ${unreadCount > 0 ? `<span class="status-badge status-pending">${unreadCount} new</span>` : ""}
     `;
     container.appendChild(card);
   }
