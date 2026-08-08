@@ -2,16 +2,37 @@ const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/initials/svg?seed=";
 let currentUserId = null;
 
 async function loadNotifBadge(userId) {
-  const { count } = await supabaseClient
+  const { count: requestCount } = await supabaseClient
     .from("exchange_requests")
     .select("id", { count: "exact", head: true })
     .eq("receiver_id", userId)
     .eq("status", "pending");
 
+  const { data: myConversations } = await supabaseClient
+    .from("conversations")
+    .select("id")
+    .or(`user_one.eq.${userId},user_two.eq.${userId}`);
+
+  const convIds = (myConversations || []).map(c => c.id);
+
+  let unreadMessages = 0;
+  if (convIds.length > 0) {
+    const { count } = await supabaseClient
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .in("conversation_id", convIds)
+      .eq("is_read", false)
+      .neq("sender_id", userId);
+
+    unreadMessages = count || 0;
+  }
+
+  const total = (requestCount || 0) + unreadMessages;
+
   const badge = document.getElementById("notifBadge");
   if (badge) {
-    if (count > 0) {
-      badge.textContent = count > 9 ? "9+" : count;
+    if (total > 0) {
+      badge.textContent = total > 9 ? "9+" : total;
       badge.classList.remove("hidden");
     } else {
       badge.classList.add("hidden");
