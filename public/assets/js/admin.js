@@ -64,7 +64,6 @@ async function loadAdminPanel() {
     .eq("id", session.user.id)
     .single();
 
-  // Block non-admins
   if (!myProfile || myProfile.is_admin !== true) {
     document.querySelector(".search-page").innerHTML = `
       <div class="access-denied">
@@ -80,7 +79,6 @@ async function loadAdminPanel() {
 
   loadNotifBadge(session.user.id);
 
-  // Stats
   const { count: userCount } = await supabaseClient.from("profiles").select("id", { count: "exact", head: true });
   const { count: skillCount } = await supabaseClient.from("skills").select("id", { count: "exact", head: true });
   const { count: requestCount } = await supabaseClient.from("exchange_requests").select("id", { count: "exact", head: true });
@@ -91,10 +89,10 @@ async function loadAdminPanel() {
   document.getElementById("statRequests").textContent = requestCount || 0;
   document.getElementById("statMessages").textContent = messageCount || 0;
 
-  // User list
+  // User list — clickable, with suspend/restore
   const { data: users } = await supabaseClient
     .from("profiles")
-    .select("id, full_name, bio, avatar_url, is_admin")
+    .select("id, full_name, bio, avatar_url, is_admin, is_disabled")
     .order("full_name");
 
   const userListContainer = document.getElementById("userList");
@@ -102,20 +100,53 @@ async function loadAdminPanel() {
 
   (users || []).forEach(user => {
     const avatarUrl = user.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(user.full_name || "Student"));
-    const card = document.createElement("div");
-    card.className = "student-card";
-    card.innerHTML = `
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "admin-user-row";
+
+    const link = document.createElement("a");
+    link.href = `view-profile.html?user=${user.id}`;
+    link.className = "student-card";
+    link.innerHTML = `
       <img src="${avatarUrl}" alt="">
       <div class="student-card-info">
-        <h3>${user.full_name || "Unnamed"} ${user.is_admin ? '<span class="admin-tag">Admin</span>' : ""}</h3>
+        <h3>${user.full_name || "Unnamed"} ${user.is_admin ? '<span class="admin-tag">Admin</span>' : ""} ${user.is_disabled ? '<span class="admin-tag suspended-tag">Suspended</span>' : ""}</h3>
         <p>${user.bio ? user.bio.slice(0, 60) : "No bio added yet."}</p>
       </div>
     `;
-    userListContainer.appendChild(card);
+    wrapper.appendChild(link);
+
+    if (!user.is_admin) {
+      const actionBtn = document.createElement("button");
+      actionBtn.className = user.is_disabled ? "btn-small btn-accept" : "btn-small btn-decline";
+      actionBtn.textContent = user.is_disabled ? "Restore" : "Suspend";
+      actionBtn.addEventListener("click", async function () {
+        const confirmed = confirm(
+          user.is_disabled
+            ? `Restore ${user.full_name || "this student"}'s access?`
+            : `Suspend ${user.full_name || "this student"}? They won't be able to log in until restored.`
+        );
+        if (!confirmed) return;
+
+        const { error } = await supabaseClient
+          .from("profiles")
+          .update({ is_disabled: !user.is_disabled })
+          .eq("id", user.id);
+
+        if (error) {
+          alert("Action failed: " + error.message);
+          return;
+        }
+        loadAdminPanel();
+      });
+      wrapper.appendChild(actionBtn);
+    }
+
+    userListContainer.appendChild(wrapper);
   });
 
   // Skills list
-  const { data: skills } = await supabaseClient
+  const { data: skills, error: skillsLoadError } = await supabaseClient
     .from("skills")
     .select("id, name")
     .order("name");
@@ -123,10 +154,14 @@ async function loadAdminPanel() {
   const skillsListContainer = document.getElementById("skillsList");
   skillsListContainer.innerHTML = "";
 
+  if (skillsLoadError) {
+    skillsListContainer.textContent = "Could not load skills: " + skillsLoadError.message;
+  }
+
   (skills || []).forEach(skill => {
     const chip = document.createElement("span");
     chip.className = "skill-admin-chip";
-    chip.innerHTML = `${skill.name} <button data-id="${skill.id}">×</button>`;
+    chip.innerHTML = `${skill.name} <button data-id="${skill.id}" type="button">×</button>`;
     skillsListContainer.appendChild(chip);
   });
 
@@ -154,4 +189,4 @@ if (logoutBtn) {
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   });
-}
+      }
