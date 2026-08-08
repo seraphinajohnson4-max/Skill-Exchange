@@ -1202,9 +1202,14 @@ footer {
 .chat-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 65px);
+  height: 100vh;
   max-width: 700px;
   margin: 0 auto;
+  overflow: hidden;
+}
+
+.chat-navbar {
+  flex-shrink: 0;
 }
 
 .chat-messages {
