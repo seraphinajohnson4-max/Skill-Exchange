@@ -92,7 +92,7 @@ async function runSearch(skillId, skillName) {
 
   const { data: matches, error } = await supabaseClient
     .from("user_skills")
-    .select("user_id, profiles(id, full_name, bio, avatar_url)")
+    .select("user_id")
     .eq("skill_id", skillId)
     .eq("type", "teach");
 
@@ -102,7 +102,28 @@ async function runSearch(skillId, skillName) {
     return;
   }
 
-  const students = (matches || []).filter(m => m.user_id !== currentUserId && m.profiles);
+  const userIds = (matches || [])
+    .map(m => m.user_id)
+    .filter(id => id !== currentUserId);
+
+  if (userIds.length === 0) {
+    emptyState.textContent = `No students found teaching "${skillName}" yet.`;
+    emptyState.classList.remove("hidden");
+    return;
+  }
+
+  const { data: profilesData, error: profilesError } = await supabaseClient
+    .from("profiles")
+    .select("id, full_name, bio, avatar_url")
+    .in("id", userIds);
+
+  if (profilesError) {
+    emptyState.textContent = "Something went wrong: " + profilesError.message;
+    emptyState.classList.remove("hidden");
+    return;
+  }
+
+  const students = profilesData || [];
 
   if (students.length === 0) {
     emptyState.textContent = `No students found teaching "${skillName}" yet.`;
@@ -110,8 +131,7 @@ async function runSearch(skillId, skillName) {
     return;
   }
 
-  students.forEach(m => {
-    const profile = m.profiles;
+  students.forEach(profile => {
     const avatarUrl = profile.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(profile.full_name || "Student"));
 
     const card = document.createElement("a");
