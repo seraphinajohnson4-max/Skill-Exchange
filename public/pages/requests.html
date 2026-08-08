@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exchange Requests - Skill Exchange</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
+      <span>SkillExchange</span>
+    </div>
+    <div class="nav-menu-wrapper">
+      <button id="menuToggle" class="menu-toggle" aria-label="Account menu">
+        <img id="navAvatar" src="" alt="" class="nav-avatar-icon">
+      </button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="search.html">Search</a>
+        <a href="profile.html">My Profile</a>
+        <a href="#" id="logoutBtn">Log Out</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="search-page">
+    <h1>Exchange Requests</h1>
+    <p class="auth-subtitle">Manage your incoming and outgoing skill exchange requests.</p>
+
+    <h3 class="section-label">Incoming</h3>
+    <div id="incomingRequests" class="results-grid"></div>
+    <p id="incomingEmpty" class="empty-state hidden">No incoming requests yet.</p>
+
+    <h3 class="section-label">Sent</h3>
+    <div id="outgoingRequests" class="results-grid"></div>
+    <p id="outgoingEmpty" class="empty-state hidden">You haven't sent any requests yet.</p>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/requests.js"></script>
+
+</body>
+  </html>
