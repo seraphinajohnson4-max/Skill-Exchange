@@ -5,6 +5,25 @@ let selectedLearn = new Set();
 
 const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/initials/svg?seed=";
 
+async function loadNotifBadge(userId) {
+  const { count } = await supabaseClient
+    .from("exchange_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", userId)
+    .eq("status", "pending");
+
+  const badge = document.getElementById("notifBadge");
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count > 9 ? "9+" : count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+  return count || 0;
+}
+
 // Dropdown menu toggle
 const menuToggle = document.getElementById("menuToggle");
 const dropdownMenu = document.getElementById("dropdownMenu");
@@ -49,7 +68,7 @@ function renderDisplayChips(containerId, skillNames) {
   });
 }
 
-// Sets up a tag-style autocomplete input. Returns a function to re-render its tags.
+// Sets up a tag-style autocomplete input
 function setupTagInput(inputId, tagsId, suggestionsId, selectedSet) {
   const input = document.getElementById(inputId);
   const tagsContainer = document.getElementById(tagsId);
@@ -150,10 +169,6 @@ function setupTagInput(inputId, tagsId, suggestionsId, selectedSet) {
   return renderTags;
 }
 
-let renderTeachTags = null;
-let renderLearnTags = null;
-
-// Refresh the read-only display without reloading everything from the database
 function refreshDisplay() {
   const fullName = document.getElementById("fullName").value.trim();
   const bio = document.getElementById("bio").value.trim();
@@ -168,7 +183,7 @@ function refreshDisplay() {
   renderDisplayChips("learnChips", learnNames);
 }
 
-// Load profile + protect page (runs once on page load)
+// Load profile + protect page
 async function loadProfile() {
   const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -208,8 +223,21 @@ async function loadProfile() {
   document.getElementById("fullName").value = name;
   document.getElementById("bio").value = profile?.bio || "";
 
-  renderTeachTags = setupTagInput("teachSkillsInput", "teachTags", "teachSuggestions", selectedTeach);
-  renderLearnTags = setupTagInput("learnSkillsInput", "learnTags", "learnSuggestions", selectedLearn);
+  const pendingCount = await loadNotifBadge(currentUserId);
+
+  const banner = document.getElementById("requestBanner");
+  if (pendingCount > 0) {
+    document.getElementById("requestBannerText").textContent =
+      pendingCount === 1
+        ? "You have 1 pending exchange request."
+        : `You have ${pendingCount} pending exchange requests.`;
+    banner.classList.remove("hidden");
+  } else {
+    banner.classList.add("hidden");
+  }
+
+  setupTagInput("teachSkillsInput", "teachTags", "teachSuggestions", selectedTeach);
+  setupTagInput("learnSkillsInput", "learnTags", "learnSuggestions", selectedLearn);
 
   refreshDisplay();
 }
@@ -314,4 +342,4 @@ if (logoutBtn) {
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   });
-    }
+}
