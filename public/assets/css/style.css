@@ -729,3 +729,93 @@ footer {
   border-color: var(--navy);
   color: white;
 }
+
+.tag-input-wrapper {
+  position: relative;
+  border: 1.5px solid #e3e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 4px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.tag-list:empty {
+  margin-bottom: 0;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--navy);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.tag-chip button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.tag-input-wrapper input {
+  border: none;
+  width: 100%;
+  padding: 6px 2px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.tag-input-wrapper input:focus {
+  outline: none;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e3e8f0;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(18,42,102,0.12);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 15;
+  display: none;
+}
+
+.suggestions-dropdown.open {
+  display: block;
+}
+
+.suggestion-item {
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.suggestion-item:hover,
+.suggestion-item:active {
+  background: var(--bg);
+}
+
+.suggestion-item.add-new {
+  color: var(--green);
+  font-weight: 600;
+  }
