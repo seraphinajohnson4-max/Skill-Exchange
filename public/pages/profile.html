@@ -59,11 +59,19 @@
       <label for="bio">Bio</label>
       <textarea id="bio" rows="3" placeholder="Tell other students a bit about yourself..."></textarea>
 
-      <label>Skills I Can Teach</label>
-      <div id="teachSkillsPicker" class="skills-picker"></div>
+      <label for="teachSkillsInput">Skills I Can Teach</label>
+      <div class="tag-input-wrapper">
+        <div id="teachTags" class="tag-list"></div>
+        <input type="text" id="teachSkillsInput" placeholder="Type a skill...">
+        <div id="teachSuggestions" class="suggestions-dropdown"></div>
+      </div>
 
-      <label>Skills I Want to Learn</label>
-      <div id="learnSkillsPicker" class="skills-picker"></div>
+      <label for="learnSkillsInput">Skills I Want to Learn</label>
+      <div class="tag-input-wrapper">
+        <div id="learnTags" class="tag-list"></div>
+        <input type="text" id="learnSkillsInput" placeholder="Type a skill...">
+        <div id="learnSuggestions" class="suggestions-dropdown"></div>
+      </div>
 
       <p id="profileMessage" class="form-message"></p>
 
@@ -74,12 +82,10 @@
     </form>
 
   </section>
-  
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-  <script>eruda.init();</script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/supabase-client.js"></script>
   <script src="../assets/js/profile.js"></script>
 
 </body>
-</html>
+  </html>
