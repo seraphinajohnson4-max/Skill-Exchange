@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Skill Exchange</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="navbar chat-navbar">
+    <a href="messages.html" class="back-link">←</a>
+    <div class="chat-header-info">
+      <img id="chatAvatar" src="" alt="" class="chat-header-avatar">
+      <span id="chatName">Loading...</span>
+    </div>
+  </header>
+
+  <section class="chat-page">
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <form id="chatForm" class="chat-input-bar">
+      <label for="fileInput" class="chat-attach-btn">📎</label>
+      <input type="file" id="fileInput" hidden>
+      <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+      <button type="submit" class="chat-send-btn">➤</button>
+    </form>
+    <p id="uploadStatus" class="upload-status hidden"></p>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/chat.js"></script>
+
+</body>
+</html>
