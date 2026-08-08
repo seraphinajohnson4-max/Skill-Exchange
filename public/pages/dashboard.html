@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Skill Exchange</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="../assets/images/file_00000000cb3881f498e1ff3461647e11.png" alt="Skill Exchange Logo">
+      <span>SkillExchange</span>
+    </div>
+    <nav>
+      <a href="profile.html">My Profile</a>
+      <a href="#" id="logoutBtn">Log Out</a>
+    </nav>
+  </header>
+
+  <section class="dashboard-section">
+    <h1>Welcome, <span id="userName">Student</span> 👋</h1>
+    <p class="auth-subtitle">Here's your Skill Exchange dashboard.</p>
+
+    <div class="dashboard-grid">
+      <a href="profile.html" class="dashboard-card">
+        <h3>My Profile</h3>
+        <p>View and edit your skills and bio.</p>
+      </a>
+      <div class="dashboard-card disabled">
+        <h3>Search Students</h3>
+        <p>Coming soon.</p>
+      </div>
+      <div class="dashboard-card disabled">
+        <h3>Exchange Requests</h3>
+        <p>Coming soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="../assets/js/dashboard.js"></script>
+
+</body>
+</html>
