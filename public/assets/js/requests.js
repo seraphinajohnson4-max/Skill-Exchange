@@ -1,6 +1,24 @@
 const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/initials/svg?seed=";
 let currentUserId = null;
 
+async function loadNotifBadge(userId) {
+  const { count } = await supabaseClient
+    .from("exchange_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", userId)
+    .eq("status", "pending");
+
+  const badge = document.getElementById("notifBadge");
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count > 9 ? "9+" : count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+}
+
 const menuToggle = document.getElementById("menuToggle");
 const dropdownMenu = document.getElementById("dropdownMenu");
 
@@ -45,7 +63,8 @@ async function loadRequests() {
   const myName = myProfile?.full_name || session.user.email;
   document.getElementById("navAvatar").src = myProfile?.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(myName));
 
-  // Incoming requests
+  loadNotifBadge(currentUserId);
+
   const { data: incoming } = await supabaseClient
     .from("exchange_requests")
     .select("id, sender_id, status, created_at")
@@ -108,7 +127,6 @@ async function loadRequests() {
     });
   }
 
-  // Outgoing requests
   const { data: outgoing } = await supabaseClient
     .from("exchange_requests")
     .select("id, receiver_id, status, created_at")
