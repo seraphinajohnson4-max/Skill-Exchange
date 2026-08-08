@@ -50,7 +50,7 @@ async function checkAuth() {
 
   const { data: profile } = await supabaseClient
     .from("profiles")
-    .select("full_name, avatar_url")
+    .select("full_name, avatar_url, is_admin")
     .eq("id", session.user.id)
     .single();
 
@@ -64,6 +64,14 @@ async function checkAuth() {
   if (navAvatar) navAvatar.src = avatarUrl;
 
   loadNotifBadge(session.user.id);
+
+  if (profile?.is_admin) {
+    const dropdown = document.getElementById("dropdownMenu");
+    const adminLink = document.createElement("a");
+    adminLink.href = "admin.html";
+    adminLink.textContent = "Admin Panel";
+    dropdown.insertBefore(adminLink, document.getElementById("logoutBtn"));
+  }
 }
 
 checkAuth();
