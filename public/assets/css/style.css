@@ -678,3 +678,54 @@ footer {
 .hidden {
   display: none;
 }
+
+.skills-picker {
+  border: 1.5px solid #e3e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.picker-category {
+  margin-bottom: 14px;
+}
+
+.picker-category:last-child {
+  margin-bottom: 0;
+}
+
+.picker-category h5 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.picker-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.picker-chip {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #e3e8f0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+}
+
+.picker-chip.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
