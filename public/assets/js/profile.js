@@ -244,17 +244,53 @@ async function loadProfile() {
   document.getElementById("fullName").value = name;
   document.getElementById("bio").value = profile?.bio || "";
 
-  const pendingCount = await loadNotifBadge(currentUserId);
+  await loadNotifBadge(currentUserId);
 
-  const banner = document.getElementById("requestBanner");
-  if (pendingCount > 0) {
+  const { count: pendingRequests } = await supabaseClient
+    .from("exchange_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", currentUserId)
+    .eq("status", "pending");
+
+  const requestBanner = document.getElementById("requestBanner");
+  if (pendingRequests > 0) {
     document.getElementById("requestBannerText").textContent =
-      pendingCount === 1
+      pendingRequests === 1
         ? "You have 1 pending exchange request."
-        : `You have ${pendingCount} pending exchange requests.`;
-    banner.classList.remove("hidden");
+        : `You have ${pendingRequests} pending exchange requests.`;
+    requestBanner.classList.remove("hidden");
   } else {
-    banner.classList.add("hidden");
+    requestBanner.classList.add("hidden");
+  }
+
+  const { data: myConversations } = await supabaseClient
+    .from("conversations")
+    .select("id")
+    .or(`user_one.eq.${currentUserId},user_two.eq.${currentUserId}`);
+
+  const convIds = (myConversations || []).map(c => c.id);
+  let unreadMessages = 0;
+
+  if (convIds.length > 0) {
+    const { count } = await supabaseClient
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .in("conversation_id", convIds)
+      .eq("is_read", false)
+      .neq("sender_id", currentUserId);
+
+    unreadMessages = count || 0;
+  }
+
+  const messageBanner = document.getElementById("messageBanner");
+  if (unreadMessages > 0) {
+    document.getElementById("messageBannerText").textContent =
+      unreadMessages === 1
+        ? "You have 1 unread message."
+        : `You have ${unreadMessages} unread messages.`;
+    messageBanner.classList.remove("hidden");
+  } else {
+    messageBanner.classList.add("hidden");
   }
 
   setupTagInput("teachSkillsInput", "teachTags", "teachSuggestions", selectedTeach);
