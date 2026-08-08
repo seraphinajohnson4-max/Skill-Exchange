@@ -2,7 +2,24 @@ const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/initials/svg?seed=";
 let allSkills = [];
 let currentUserId = null;
 
-// Dropdown menu
+async function loadNotifBadge(userId) {
+  const { count } = await supabaseClient
+    .from("exchange_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", userId)
+    .eq("status", "pending");
+
+  const badge = document.getElementById("notifBadge");
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count > 9 ? "9+" : count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+}
+
 const menuToggle = document.getElementById("menuToggle");
 const dropdownMenu = document.getElementById("dropdownMenu");
 
@@ -35,6 +52,8 @@ async function init() {
   const name = profile?.full_name || session.user.email;
   const avatarUrl = profile?.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(name));
   document.getElementById("navAvatar").src = avatarUrl;
+
+  loadNotifBadge(currentUserId);
 
   const { data: skillsData } = await supabaseClient
     .from("skills")
@@ -125,12 +144,6 @@ async function runSearch(skillId, skillName) {
 
   const students = profilesData || [];
 
-  if (students.length === 0) {
-    emptyState.textContent = `No students found teaching "${skillName}" yet.`;
-    emptyState.classList.remove("hidden");
-    return;
-  }
-
   students.forEach(profile => {
     const avatarUrl = profile.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(profile.full_name || "Student"));
 
@@ -150,7 +163,6 @@ async function runSearch(skillId, skillName) {
   });
 }
 
-// Log out
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async function (e) {
