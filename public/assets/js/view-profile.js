@@ -78,9 +78,37 @@ async function init() {
   if (viewedUserId === session.user.id) {
     requestBtn.style.display = "none";
   } else {
-    requestBtn.addEventListener("click", function () {
-      alert("Exchange requests are coming in the next phase!");
-    });
+    // Check if a request already exists between these two users
+    const { data: existing } = await supabaseClient
+      .from("exchange_requests")
+      .select("id, status")
+      .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${viewedUserId}),and(sender_id.eq.${viewedUserId},receiver_id.eq.${session.user.id})`)
+      .maybeSingle();
+
+    if (existing) {
+      requestBtn.textContent = existing.status === "pending" ? "Request Pending" : "Already Connected";
+      requestBtn.disabled = true;
+      requestBtn.classList.add("btn-disabled");
+    } else {
+      requestBtn.addEventListener("click", async function () {
+        requestBtn.disabled = true;
+        requestBtn.textContent = "Sending...";
+
+        const { error } = await supabaseClient
+          .from("exchange_requests")
+          .insert({ sender_id: session.user.id, receiver_id: viewedUserId });
+
+        if (error) {
+          alert("Could not send request: " + error.message);
+          requestBtn.disabled = false;
+          requestBtn.textContent = "Request Skill Exchange";
+          return;
+        }
+
+        requestBtn.textContent = "Request Pending";
+        requestBtn.classList.add("btn-disabled");
+      });
+    }
   }
 }
 
