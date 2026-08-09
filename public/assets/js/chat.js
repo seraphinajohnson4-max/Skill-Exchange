@@ -9,6 +9,21 @@ const chatInput = document.getElementById("chatInput");
 const fileInput = document.getElementById("fileInput");
 const uploadStatus = document.getElementById("uploadStatus");
 
+function openImagePreview(src) {
+  const overlay = document.createElement("div");
+  overlay.className = "image-preview-overlay";
+  overlay.innerHTML = `
+    <button type="button" class="preview-close-btn">✕</button>
+    <img src="${src}" class="preview-image" alt="Preview">
+  `;
+  overlay.addEventListener("click", function (e) {
+    if (e.target === overlay || e.target.classList.contains("preview-close-btn")) {
+      overlay.remove();
+    }
+  });
+  document.body.appendChild(overlay);
+}
+
 async function downloadFile(url, filename) {
   try {
     const response = await fetch(url);
@@ -42,8 +57,8 @@ function renderMessage(msg) {
     if (msg.file_type === "image") {
       innerHtml += `
         <div class="image-wrapper">
-          <img src="${msg.file_url}" class="message-image" alt="Shared image">
-          <button type="button" class="download-overlay-btn" data-url="${msg.file_url}" data-name="${escapeHtml(msg.file_name || 'image.jpg')}">⬇</button>
+          <img src="${msg.file_url}" class="message-image clickable-image" alt="Shared image">
+          <button type="button" class="download-overlay-btn" data-url="${msg.file_url}" data-name="${escapeHtml(msg.file_name || 'image.jpg')}">⬇ Download</button>
         </div>
       `;
     } else if (msg.file_type === "video") {
@@ -64,8 +79,16 @@ function renderMessage(msg) {
 
   const downloadBtn = bubble.querySelector(".download-overlay-btn");
   if (downloadBtn) {
-    downloadBtn.addEventListener("click", function () {
+    downloadBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
       downloadFile(downloadBtn.dataset.url, downloadBtn.dataset.name);
+    });
+  }
+
+  const clickableImg = bubble.querySelector(".clickable-image");
+  if (clickableImg) {
+    clickableImg.addEventListener("click", function () {
+      openImagePreview(clickableImg.src);
     });
   }
 
