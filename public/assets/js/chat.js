@@ -163,12 +163,25 @@ async function init() {
 
 init();
 
+chatInput.addEventListener("input", function () {
+  chatInput.style.height = "auto";
+  chatInput.style.height = chatInput.scrollHeight + "px";
+});
+
+chatInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    chatForm.requestSubmit();
+  }
+});
+
 chatForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   const text = chatInput.value.trim();
   if (!text) return;
 
   chatInput.value = "";
+  chatInput.style.height = "auto";
 
   const { data, error } = await supabaseClient.from("messages").insert({
     conversation_id: conversationId,
