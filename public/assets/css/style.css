@@ -1229,6 +1229,7 @@ html, body {
 
 .message-bubble {
   max-width: 75%;
+  width: fit-content;
   padding: 10px 14px;
   border-radius: 16px;
   font-size: 0.92rem;
@@ -1268,8 +1269,8 @@ html, body {
   margin-top: 4px;
 }
 
-.message-file-link {
-  display: flex;
+..message-file-link {
+  display: inline-flex;
   align-items: flex-start;
   gap: 6px;
   color: inherit;
@@ -1278,6 +1279,7 @@ html, body {
   overflow-wrap: break-word;
   word-break: break-word;
   max-width: 100%;
+  width: fit-content;
 }
 
 .chat-input-bar {
