@@ -21,18 +21,37 @@ function renderMessage(msg) {
 
   if (msg.file_url) {
     if (msg.file_type === "image") {
-      innerHtml += `<img src="${msg.file_url}" class="message-image" alt="Shared image">`;
+      innerHtml += `
+        <div class="image-wrapper">
+          <img src="${msg.file_url}" class="message-image" alt="Shared image">
+          <a href="${msg.file_url}" download="${msg.file_name || 'image'}" class="download-overlay-btn" target="_blank">⬇</a>
+        </div>
+      `;
     } else if (msg.file_type === "video") {
       innerHtml += `<video src="${msg.file_url}" controls></video>`;
     } else if (msg.file_type === "audio") {
       innerHtml += `<audio src="${msg.file_url}" controls></audio>`;
     } else {
-      innerHtml += `<a href="${msg.file_url}" target="_blank" class="message-file-link">📄 Download file</a>`;
+      innerHtml += `
+        <a href="${msg.file_url}" target="_blank" class="message-file-link">
+          📄 ${escapeHtml(msg.file_name || "Download file")}
+        </a>
+      `;
     }
   }
 
   bubble.innerHTML = innerHtml;
   chatMessages.appendChild(bubble);
+
+  // Pause other media when this one plays
+  const mediaEl = bubble.querySelector("video, audio");
+  if (mediaEl) {
+    mediaEl.addEventListener("play", function () {
+      document.querySelectorAll("#chatMessages video, #chatMessages audio").forEach(function (other) {
+        if (other !== mediaEl) other.pause();
+      });
+    });
+  }
 }
 
 function escapeHtml(text) {
@@ -86,7 +105,6 @@ async function init() {
   document.getElementById("chatName").textContent = otherName;
   document.getElementById("chatAvatar").src = otherProfile?.avatar_url || (DEFAULT_AVATAR + encodeURIComponent(otherName));
 
-  // Load existing messages
   const { data: messages } = await supabaseClient
     .from("messages")
     .select("*")
@@ -96,7 +114,6 @@ async function init() {
   (messages || []).forEach(renderMessage);
   scrollToBottom();
 
-  // Mark all messages from the other person as read
   await supabaseClient
     .from("messages")
     .update({ is_read: true })
@@ -104,7 +121,6 @@ async function init() {
     .neq("sender_id", currentUserId)
     .eq("is_read", false);
 
-  // Listen for new messages in real time
   supabaseClient
     .channel("messages-" + conversationId)
     .on("postgres_changes", {
@@ -121,7 +137,6 @@ async function init() {
 
 init();
 
-// Send text message
 chatForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   const text = chatInput.value.trim();
@@ -144,7 +159,6 @@ chatForm.addEventListener("submit", async function (e) {
   scrollToBottom();
 });
 
-// Send file
 fileInput.addEventListener("change", async function () {
   const file = fileInput.files[0];
   if (!file) return;
@@ -176,7 +190,8 @@ fileInput.addEventListener("change", async function () {
     conversation_id: conversationId,
     sender_id: currentUserId,
     file_url: urlData.publicUrl,
-    file_type: fileType
+    file_type: fileType,
+    file_name: file.name
   }).select().single();
 
   uploadStatus.classList.add("hidden");
