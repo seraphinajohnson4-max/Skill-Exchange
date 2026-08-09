@@ -9,6 +9,25 @@ const chatInput = document.getElementById("chatInput");
 const fileInput = document.getElementById("fileInput");
 const uploadStatus = document.getElementById("uploadStatus");
 
+async function downloadFile(url, filename) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = filename || "download";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    alert("Download failed. Try long-pressing the image instead.");
+  }
+}
+
 function renderMessage(msg) {
   const bubble = document.createElement("div");
   bubble.className = "message-bubble " + (msg.sender_id === currentUserId ? "message-mine" : "message-theirs");
@@ -24,7 +43,7 @@ function renderMessage(msg) {
       innerHtml += `
         <div class="image-wrapper">
           <img src="${msg.file_url}" class="message-image" alt="Shared image">
-          <a href="${msg.file_url}" download="${msg.file_name || 'image'}" class="download-overlay-btn" target="_blank">⬇</a>
+          <button type="button" class="download-overlay-btn" data-url="${msg.file_url}" data-name="${escapeHtml(msg.file_name || 'image.jpg')}">⬇</button>
         </div>
       `;
     } else if (msg.file_type === "video") {
@@ -42,6 +61,13 @@ function renderMessage(msg) {
 
   bubble.innerHTML = innerHtml;
   chatMessages.appendChild(bubble);
+
+  const downloadBtn = bubble.querySelector(".download-overlay-btn");
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", function () {
+      downloadFile(downloadBtn.dataset.url, downloadBtn.dataset.name);
+    });
+  }
 
   // Pause other media when this one plays
   const mediaEl = bubble.querySelector("video, audio");
