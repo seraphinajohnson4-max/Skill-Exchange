@@ -172,13 +172,21 @@ fileInput.addEventListener("change", async function () {
   else if (file.type.startsWith("video/")) fileType = "video";
   else if (file.type.startsWith("audio/")) fileType = "audio";
 
-  await supabaseClient.from("messages").insert({
+  const { data, error } = await supabaseClient.from("messages").insert({
     conversation_id: conversationId,
     sender_id: currentUserId,
     file_url: urlData.publicUrl,
     file_type: fileType
-  });
+  }).select().single();
 
   uploadStatus.classList.add("hidden");
   fileInput.value = "";
+
+  if (error) {
+    alert("Message failed to send: " + error.message);
+    return;
+  }
+
+  renderMessage(data);
+  scrollToBottom();
 });
