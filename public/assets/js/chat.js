@@ -168,12 +168,7 @@ chatInput.addEventListener("input", function () {
   chatInput.style.height = chatInput.scrollHeight + "px";
 });
 
-chatInput.addEventListener("keydown", function (e) {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    chatForm.requestSubmit();
-  }
-});
+// Enter always creates a new line — only the send button sends the message
 
 chatForm.addEventListener("submit", async function (e) {
   e.preventDefault();
