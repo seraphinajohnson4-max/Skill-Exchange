@@ -1297,16 +1297,20 @@ html, body {
   flex-shrink: 0;
 }
 
-.chat-input-bar input[type="text"] {
+.chat-input-bar textarea {
   flex: 1;
   border: 1.5px solid #e3e8f0;
-  border-radius: 999px;
+  border-radius: 20px;
   padding: 10px 16px;
   font-size: 0.95rem;
   font-family: 'Inter', sans-serif;
+  resize: none;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.4;
 }
 
-.chat-input-bar input[type="text"]:focus {
+.chat-input-bar textarea:focus {
   outline: none;
   border-color: var(--navy);
 }
