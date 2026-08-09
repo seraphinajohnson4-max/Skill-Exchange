@@ -1408,3 +1408,29 @@ footer {
 .suspended-tag {
   background: #dc2626;
 }
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.image-wrapper .message-image {
+  margin-top: 0;
+}
+
+.download-overlay-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 1rem;
+    }
